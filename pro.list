@@ -1,0 +1,5 @@
+发行人全称 name CHAR(100) 1
+信评日期 date CHAR(100) 0
+主体等级序列 mainIndex CHAR(100) 0
+债券简称 abbre CHAR(100) 1
+债项等级序列 itemIndex CHAR(100) 0

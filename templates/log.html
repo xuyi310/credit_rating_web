@@ -1,0 +1,143 @@
+<script type=text/javascript src="{{url_for('static', filename='jquery-3.1.0.min.js') }}"></script>
+{% extends "bootstrap/base.html" %}
+{% block title %}Flasky{% endblock %}
+{% include 'head.html' %}
+{% block content %}
+<div class="container">
+	<div class="page-header">
+		<h2>操作日志</h2>
+	</div>
+	<div class="row">
+
+		<br/>
+		<table class="table table-striped table-bordered table-condensed" >
+			<tr>
+				{% for item in pro_arr %}
+				{% if item[2] == '1' %}
+				<th>
+					{{ item[0] }}
+				</th>
+				{% endif %}
+				{% endfor %}
+				<th>操作时间</th>
+				<th>操作人员</th>
+				<th>操作类型</th>
+				<th></th>
+			</tr>
+			{% for item in info_arr %}
+			<tr>
+				{% for p_item in pro_arr %}
+				{% if p_item[2] == '1' %}
+					{% if item['type'] == 'insert' or item['type'] == 'update' %}
+					<td item_name="{{ p_item[1] }}">
+						{{ item[p_item[1] + '_new'] }}
+					</td>
+					{% elif item['type'] == 'delete' %}
+					<td item_name="{{ p_item[1] }}">
+						{{ item[p_item[1] + '_old'] }}
+					</td>
+					{% endif %}
+				{% endif %}
+				{% endfor %}
+				<td>
+					{{ item['insert_time'] }}
+				</td>
+				<td>
+					{{ item['author'] }}
+				</td>
+				<td>
+					{{ item['type'] }}
+				</td>
+				<td>
+					{% if item['type'] == 'insert' %}
+					<button type="button" {% for p_item in pro_arr %} {{ p_item[1] }}_new = "{{item[p_item[1] + '_new']}}" {{ p_item[1] }}_old = "{{item[p_item[1] + '_old']}}" {% endfor %} class="btn btn-info item_info" data-toggle="modal" data-target="#my_info" item_type="insert">查看详情</button>
+					{% elif item['type'] == 'update' %}
+					<button type="button" {% for p_item in pro_arr %} {{ p_item[1] }}_new = "{{item[p_item[1] + '_new']}}" {{ p_item[1] }}_old = "{{item[p_item[1] + '_old']}}" {% endfor %} class="btn btn-info item_info" data-toggle="modal" data-target="#my_info" item_type="update">查看详情</button>
+					{% elif item['type'] == 'delete' %}
+					<button type="button" {% for p_item in pro_arr %} {{ p_item[1] }}_new = "{{item[p_item[1] + '_new']}}" {{ p_item[1] }}_old = "{{item[p_item[1] + '_old']}}" {% endfor %} class="btn btn-info item_info" data-toggle="modal" data-target="#my_info" item_type="delete">查看详情</button>
+
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+
+<div class="modal fade" id="my_info" tabindex="-1" role="dialog" aria-labelledby="my_info">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="info_title"></h4>
+      </div>
+      <div class="modal-body">
+		  <table class="table" id="info_body">
+
+		  </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+	$('document').ready(function(){
+	    var excludeSpecial = function(s) {
+    		// 去掉转义字符
+    		s = s.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+    		// 去掉特殊字符
+    		s = s.replace(/[\@\#\$\%\^\&\*\{\}\:\"\L\<\>\?]/);
+    		return s;
+ 		};
+
+		$(".item_info").click(function(){
+			i_info = new Array()
+			i_new  = new Array()
+			i_old  = new Array()
+
+			{% for item in pro_arr %}
+				i_info.push("{{ item[0] }}")
+				i_new.push($(this).attr("{{ item[1]}}_new"))
+				i_old.push($(this).attr("{{ item[1]}}_old"))
+			{% endfor %}
+			i_type = $(this).attr("item_type")
+
+
+			i_str = ''
+			if( i_type == 'insert'){
+			    $('#info_title').html("添加数据详情")
+				for(i=0; i<i_info.length; i++){
+				    i_str += '<tr>'
+					i_str += '<td>'+i_info[i]+'</td>'
+					i_str += '<td>'+i_new[i]+'</td>'
+					i_str += '</tr>'
+				}
+			}else if(i_type == 'update'){
+			    $('#info_title').html("修改数据详情")
+				i_str += '<tr><th></th><th>修改前</th><th>修改后</th></tr>'
+				for(i=0; i<i_info.length; i++){
+				    i_str += '<tr>'
+					i_str += '<td>'+i_info[i]+'</td>'
+					i_str += '<td>'+i_old[i]+'</td>'
+					i_str += '<td>'+i_new[i]+'</td>'
+					i_str += '</tr>'
+				}
+			}else if(i_type == 'delete'){
+			    $('#info_title').html("删除数据详情")
+				for(i=0; i<i_info.length; i++){
+				    i_str += '<tr>'
+					i_str += '<td>'+i_info[i]+'</td>'
+					i_str += '<td>'+i_old[i]+'</td>'
+					i_str += '</tr>'
+				}
+			}
+			$('#info_body').html(i_str)
+
+
+
+		})
+	})
+</script>
+
+{% endblock %}

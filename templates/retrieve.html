@@ -1,0 +1,72 @@
+<script type=text/javascript src="{{url_for('static', filename='jquery-3.1.0.min.js') }}"></script>
+{% extends "bootstrap/base.html" %}
+{% block title %}Flasky{% endblock %}
+{% include 'head.html' %}
+{% block content %}
+<div class="container">
+	<div class="page-header">
+		<h2>数据查询</h2>
+	</div>
+	<div class="row">
+		<select >
+			{% for item in pro_arr %}
+  			<option>{{ item[0] }}</option>
+			{% endfor %}
+
+
+		</select>
+		<input type="text" id="keyword">
+		<button id="search">搜索</button>
+
+		<table class="table" >
+			<thead>
+				<tr>
+					{% for item in pro_arr %}
+					<th>{{ item[0] }}</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody id="search_info">
+
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+	$('document').ready(function(){
+	    var excludeSpecial = function(s) {
+    		// 去掉转义字符
+    		s = s.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+    		// 去掉特殊字符
+    		s = s.replace(/[\@\#\$\%\^\&\*\{\}\:\"\L\<\>\?]/);
+    		return s;
+ 		};
+
+		$('#search').click(function(){
+		    key = $('#keyword').val()
+			$.post(
+				"/info_search",
+				{'key' : key},
+				function(result){
+
+				    i_str = ''
+					for(i=0; i<result.info.length; i++){
+				        i_str += '<tr>'
+
+						for(j=1; j< result.info[i].length; j++){
+				            i_str += '<td>'+result.info[i][j]+'</td>'
+						}
+						i_str += '</tr>'
+					}
+					$('#search_info').html(i_str)
+				},
+				'json'
+			);
+		})
+	})
+</script>
+
+{% endblock %}

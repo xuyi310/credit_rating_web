@@ -1,0 +1,113 @@
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+                data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+			<a class="navbar-brand" href="/edit">信评库系统</a>
+        </div>
+		{% if login_info['is_login'] == 1 %}
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+				<li><a href="/">上传Excel</a></li>
+				<li><a href="/edit">编辑</a></li>
+				<li><a href="/retrieve">查询</a></li>
+				<li><a href="/log">Log</a></li>
+            </ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="#" >欢迎，{{ login_info['login_name']}} !</a></li>
+				<li><a href="#" data-toggle="modal" id="get_loginout">登出</a></li>
+            </ul>
+        </div>
+		{% elif login_info['is_login'] == 0 %}
+		<div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+				<li><a href="/retrieve">查询</a></li>
+            </ul>
+			 <ul class="nav navbar-nav navbar-right">
+				<li><a href="#" data-toggle="modal" data-target="#my_login">登录</a></li>
+            </ul>
+        </div>
+
+
+		{% endif %}
+    </div>
+</div>
+
+
+<div class="modal fade" id="my_login" tabindex="-1" role="dialog" aria-labelledby="my_login">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">登录</h4>
+      </div>
+      <div class="modal-body">
+		  <table class="table">
+			<tr>
+				<td>用户名</td>
+				<td>
+					<input type="text" id="login_name">
+				</td>
+			</tr>
+			<tr>
+				<td>密码</td>
+				<td>
+					<input type="password" id="login_pwd">
+				</td>
+			</tr>
+		  </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="get_login">登录</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+	$('document').ready(function(){
+	    $('#get_login').click(function(){
+	        l_name = $('#login_name').val()
+			l_pwd  = $('#login_pwd').val()
+			$.post(
+				"/get_login",
+				{
+				    'name' : l_name,
+					'pwd'  : l_pwd
+				},
+				function(result){
+					if(result == '1'){
+						alert('login succeed.')
+						window.location.href="/edit"
+					}else{
+					    alert('invalid username or password.')
+					}
+				}
+			);
+		})
+
+		$('#get_loginout').click(function(){
+		    $.post(
+				"/get_loginout",
+				{
+
+				},
+				function(result){
+					if(result == '1'){
+						alert('loginout succeed.')
+						window.location.href="/edit"
+					}
+				}
+			);
+		})
+	})
+</script>
+{% endblock %}
